@@ -41,27 +41,21 @@ describe("POST /sign-up", () => {
 
     expect(response.status).toBe(400);
   });
-});
 
-describe("POST /sign-up", () => {
   it("should respond with status 400 when body has no valid email", async () => {
     const user = await createUser({ email: "a" });
     const response = await agent.post("/sign-up").send(user.reqData);
 
     expect(response.status).toBe(400);
   });
-});
 
-describe("POST /sign-up", () => {
   it("should respond with status 400 when body has no valid password", async () => {
     const user = await createUser({ password: "" });
     const response = await agent.post("/sign-up").send(user.reqData);
 
     expect(response.status).toBe(400);
   });
-});
 
-describe("POST /sign-up", () => {
   it("should respond with status 409 when email is taken", async () => {
     const user = await createUser({});
 
@@ -72,9 +66,7 @@ describe("POST /sign-up", () => {
 
     expect(response.status).toBe(409);
   });
-});
 
-describe("POST /sign-up", () => {
   it("should not store the password", async () => {
     const user = await createUser({});
     await agent.post("/sign-up").send(user.reqData);
