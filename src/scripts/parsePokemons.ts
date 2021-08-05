@@ -8,9 +8,17 @@ function readPokemons() {
 const pokemons = readPokemons();
 
 const parsedPokemons: Pokemon = pokemons.map((pokemon: any) => {
-  const {id:number, name, weight, height, base_experience:baseExp} = pokemon;
+  const {
+    id: number,
+    name,
+    weight,
+    height,
+    base_experience: baseExp,
+  } = pokemon;
   const image = pokemon.sprites["front_default"];
-  const description = pokemon.species["flavor_text_entries"].find((entry:any)=>entry.language.name==="en")?.["flavor_text"];
+  const description = pokemon.species["flavor_text_entries"].find(
+    (entry: any) => entry.language.name === "en"
+  )?.["flavor_text"];
   return {
     name,
     number,
@@ -18,7 +26,7 @@ const parsedPokemons: Pokemon = pokemons.map((pokemon: any) => {
     weight,
     height,
     baseExp,
-    description
+    description,
   };
 });
 
