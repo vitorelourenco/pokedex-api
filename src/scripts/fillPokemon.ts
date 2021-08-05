@@ -1,7 +1,7 @@
 const pg = require("pg");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const database = require("./database");
+const database = require("./pgDatabase");
 
 dotenv.config();
 
@@ -20,12 +20,24 @@ const pokemons = JSON.parse(
   fs.readFileSync("./parsedPokemons.json").toString()
 );
 
+console.log(pokemons.length);
+
 (async () => {
-  await database.reset();
+  await database.clear();
+  
   for (const pokemon of pokemons) {
     const { name, number, image, weight, height, baseExp, description } =
       pokemon;
-    const params = [name, number, image, weight, height, baseExp, description];
+
+    const text = description
+    .split("\n")
+    .map((line:string) => line.trim())
+    .join(" ");
+
+    let fDescription = text.replace(/\f/m," ");
+    fDescription = fDescription.replace(/\\f/m," ");
+
+    const params = [name, number, image, weight, height, baseExp, fDescription];
     await connection.query(
       `
       INSERT INTO pokemons
@@ -35,5 +47,6 @@ const pokemons = JSON.parse(
     `,
       params
     );
+    console.log(params);
   }
 })();

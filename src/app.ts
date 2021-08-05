@@ -6,7 +6,6 @@ import "reflect-metadata";
 
 import connectDatabase from "./database";
 
-import * as userController from "./controllers/userConroller";
 import myPokemonsRouter from "./routers.ts/myPokemonsRouter";
 import pokemonsRouter from "./routers.ts/pokemonsRouter";
 import signinRouter from "./routers.ts/signinRouter";
