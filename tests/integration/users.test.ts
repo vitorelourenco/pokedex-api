@@ -1,9 +1,14 @@
+import "../jestNamespace";
+
 import supertest from "supertest";
 import { getConnection } from "typeorm";
 
 import app, { init } from "../../src/app";
 import { createUser } from "../factories/userFactory";
 import * as dabatase  from "../../src/scripts/database";
+import toMatchSchema from "../schemas/toMatchSchema";
+
+expect.extend({toMatchSchema});
 
 beforeAll(async () => {
   await init();
