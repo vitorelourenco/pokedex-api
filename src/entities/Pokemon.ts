@@ -26,3 +26,4 @@ export default class Pokemon {
   @Column()
   description: string;
 }
+
