@@ -13,6 +13,7 @@ async function getAllPokemons() {
       .get(url)
       .then(({ data }) => {
         pokemons.push(data);
+        console.log(id);
         id++;
       })
       .catch(() => (getNext = false));
