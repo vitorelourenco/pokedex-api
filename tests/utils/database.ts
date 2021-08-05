@@ -1,4 +1,6 @@
+import supertest from "supertest";
 import { getConnection } from "typeorm";
+import app from "../../src/app";
 import { createUser } from "../factories/userFactory";
 
 export async function reset() {
@@ -17,3 +19,10 @@ export async function reset() {
   }
 }
 
+export async function createAndSignIn(){
+  const user = await createUser({});
+  await user.saveToDatabase();
+  const {email, password} = user.reqData;
+  const response = await supertest(app).post("/sign-in").send({email,password});
+  return {user, response, email, password}
+}
