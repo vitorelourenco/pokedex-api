@@ -1,13 +1,18 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import ReqUser from "../protocols/ReqUser";
+import userSchema from "../schemas/userSchema";
 
 import * as userService from "../services/userService";
 
-export async function getUsers (req: Request, res: Response) {
+export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const users = await userService.getUsers();
-    res.send(users);
+    const { error: joiError } = userSchema.validate(req.body);
+    if (joiError) throw joiError;
+
+    const { email, password } = req.body as ReqUser;
+    await userService.create({ email, password });
+    res.sendStatus(201);
   } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+    next(err);
   }
 }
