@@ -1,4 +1,5 @@
 import { getConnection } from "typeorm";
+import { createUser } from "../factories/userFactory";
 
 export async function reset() {
   const connection = getConnection();
@@ -9,5 +10,10 @@ export async function reset() {
 
   await connection.query(`ALTER SEQUENCE "sessions_id_seq" RESTART WITH 1`);
   await connection.query(`ALTER SEQUENCE "users_id_seq" RESTART WITH 1`);
+
+  for(let i=0; i<5; i++){
+    const user = await createUser({});
+    await user.saveToDatabase();
+  }
 }
 

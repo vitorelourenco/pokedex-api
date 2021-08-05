@@ -25,8 +25,9 @@ export class Instance{
   saveToDatabase: Function;
   constructor(entity:any, ormData:any, reqData:any){
     this.entity = entity;
-    this.ormRepository = getRepository(entity);
     this.reqData = reqData;
+    this.ormData = ormData;
+    this.ormRepository = getRepository(entity);
     this.ormInstance = getRepository(entity).create(ormData);
     this.saveToDatabase = async() => getRepository(entity).save(this.ormInstance);
   }
