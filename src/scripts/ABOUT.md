@@ -1,0 +1,1 @@
+The scripts in this folder were used to download, parse and include the data from the pokeapi https://pokeapi.co/ . These scripts are not used in the application but are included in this repo. They aren't being compiled to ./dist with npm run build so if you wanna run them, do npx ts-node src/scripts/foo.ts
