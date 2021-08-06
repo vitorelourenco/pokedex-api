@@ -20,7 +20,7 @@ export async function updatePokemons(req: Request, res: Response, next: NextFunc
     if(action === "add"){
       await myPokemonsService.add(userId, pokemonId);
     } else if (action === "remove"){
-      // await myPokemonsService.remove(user.id);
+      await myPokemonsService.remove(userId, pokemonId);
     }
 
     res.sendStatus(200);
