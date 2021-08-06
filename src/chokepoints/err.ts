@@ -9,6 +9,8 @@ export default function err(
   next: NextFunction
 ) {
 
+  console.error(err);
+
   if(err instanceof DeepValidationError){
     res.status(err.code);
   } else if(err instanceof ValidationError) {

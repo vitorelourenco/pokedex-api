@@ -23,7 +23,7 @@ export async function reset() {
   }
 }
 
-export async function createAndSignIn() {
+export async function createUserAndSignIn() {
   const user = await createUser({});
   await user.saveToDatabase();
   const { email, password } = user.reqData;
@@ -33,7 +33,7 @@ export async function createAndSignIn() {
   return { user, response, email, password };
 }
 
-export async function createUserAndSession() {
+export async function createUserWithSession() {
   const user = await createUser({});
   await user.saveToDatabase();
   const { email, password } = user.reqData;
@@ -49,14 +49,39 @@ export async function createUserAndSession() {
   return { user, token, email, password, header, dbUser };
 }
 
-export async function createUserWithPokemonAndSession(pokemonId?: number) {
-  const { user, token, email, password, header } = await createUserAndSession();
-  const dbUser = await getRepository(User).findOne({
-    where: { email: user.reqData.email },
-    relations: ["pokemons"],
-  });
+export async function createUserWithSessionAndPokemon(pokemonId?: number) {
+  const { user, token, email, password, header } =
+    await createUserWithSession();
+  const dbUser = await getUserWithPokemons(user.reqData.email);
   const pokemon = await getRepository(Pokemon).findOne({ id: pokemonId || 1 });
   dbUser.pokemons.push(pokemon);
   await getRepository(User).save(dbUser);
   return { user, token, email, password, header, dbUser };
+}
+
+export async function getUserWithPokemons(email: string) {
+  const user = await getRepository(User).findOne({
+    relations: ["pokemons"],
+    where: { email },
+  });
+  return user;
+}
+
+export function userHasPokemon(user: User, pokemonId: number) {
+  return !!user?.pokemons?.find((pokemon) => pokemon.id === pokemonId);
+}
+
+export async function findSessionWithToken(token:string){
+  const key = process.env.JWT_SECRET;
+
+  try {
+    const data = jwt.verify(token, key) as { sessionId: number };
+    const id = data.sessionId;
+    const session = await getRepository(Session).findOne({ id });
+    return session;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+
 }

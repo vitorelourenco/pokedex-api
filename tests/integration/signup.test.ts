@@ -26,15 +26,20 @@ afterAll(async () => {
 const agent = supertest(app);
 
 describe("POST /sign-up", () => {
-  it("should respond with status 201", async () => {
+
+  it("should respond with status 201(success) or 409(conflict) ", async () => {
     const user = await createUser({});
-    const response = await agent.post("/sign-up").send(user.reqData);
 
-    expect(response.status).toBe(201);
+    //conflict check is done over volatile data => shooting 2 requests
+    //if the app instance does not find a conflict where there is one
+    //database will throw and status should be 500 (no tests for this)
+    const firstResponse = await agent.post("/sign-up").send(user.reqData);
+    const secondResponse = await agent.post("/sign-up").send(user.reqData);
+
+    expect(firstResponse.status).toBe(201);
+    expect(secondResponse.status).toBe(409);
   });
-});
 
-describe("POST /sign-up", () => {
   it("should respond with status 400 when passwords dont match", async () => {
     const user = await createUser({ password: "b", confirmPassword: "a" });
     const response = await agent.post("/sign-up").send(user.reqData);
@@ -56,23 +61,12 @@ describe("POST /sign-up", () => {
     expect(response.status).toBe(400);
   });
 
-  it("should respond with status 409 when email is taken", async () => {
-    const user = await createUser({});
-
-    //conflict check is done over volatile data, shooting 2 requests
-    //if conflict checked -> status 409 , if conflict happened unchecked -> status 500
-    await agent.post("/sign-up").send(user.reqData)
-    const response = await agent.post("/sign-up").send(user.reqData);
-
-    expect(response.status).toBe(409);
-  });
-
   it("should not store the password", async () => {
     const user = await createUser({});
     await agent.post("/sign-up").send(user.reqData);
-    const savedUser = await user.ormRepository.findOne({
+    const dbUser = await user.ormRepository.findOne({
       where: { email: user.reqData.email },
     });
-    expect(savedUser.password).not.toBe(user.reqData.password);
+    expect(dbUser.password).not.toBe(user.reqData.password);
   });
 });
