@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import Session from "../entities/Session";
 import jwt from "jsonwebtoken";
-import { DeepValidationError } from "../protocols/DeepValidationError";
 import User from "../entities/User";
 
 export default async function auth(
