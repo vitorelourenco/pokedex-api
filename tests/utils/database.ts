@@ -37,12 +37,14 @@ export async function createUserWithSession() {
   const user = await createUser({});
   await user.saveToDatabase();
   const { email, password } = user.reqData;
-  const userRepository = getRepository(User);
-  const dbUser = await userRepository.findOne({ email });
+
+  const dbUser = await findUserWithEmail(email);
+
   const sessionRepository = getRepository(Session);
   const newSession = sessionRepository.create({ user: dbUser });
   await sessionRepository.save(newSession);
   const sessionId = newSession.id;
+
   const key = process.env.JWT_SECRET;
   const token = jwt.sign({ sessionId }, key);
   const header = { Authorization: `Bearer ${token}` };
@@ -71,7 +73,7 @@ export function userHasPokemon(user: User, pokemonId: number) {
   return !!user?.pokemons?.find((pokemon) => pokemon.id === pokemonId);
 }
 
-export async function findSessionWithToken(token:string){
+export async function findSessionWithToken(token: string) {
   const key = process.env.JWT_SECRET;
 
   try {
@@ -83,5 +85,8 @@ export async function findSessionWithToken(token:string){
     console.log(err);
     return null;
   }
+}
 
+export async function findUserWithEmail(email: string) {
+  return getRepository(User).findOne({ email });
 }

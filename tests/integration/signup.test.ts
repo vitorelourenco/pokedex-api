@@ -7,6 +7,8 @@ import { getConnection } from "typeorm";
 import app, { init } from "../../src/app";
 import { createUser } from "../factories/userFactory";
 import * as database from "../utils/database";
+import { findUserWithEmail } from "../utils/database";
+
 import toMatchSchema from "../schemas/toMatchSchema";
 
 expect.extend({ toMatchSchema });
@@ -26,7 +28,6 @@ afterAll(async () => {
 const agent = supertest(app);
 
 describe("POST /sign-up", () => {
-
   it("should respond with status 201(success) or 409(conflict) ", async () => {
     const user = await createUser({});
 
@@ -38,6 +39,16 @@ describe("POST /sign-up", () => {
 
     expect(firstResponse.status).toBe(201);
     expect(secondResponse.status).toBe(409);
+  });
+
+  it("should add user to database ", async () => {
+    const user = await createUser({});
+    const dbUserBefore = await findUserWithEmail(user.reqData.email);
+    await agent.post("/sign-up").send(user.reqData);
+    const dbUserAfter = await findUserWithEmail(user.reqData.email);
+
+    const userWasAdded = !!(dbUserBefore ?? dbUserAfter);
+    expect(userWasAdded).toBe(true);
   });
 
   it("should respond with status 400 when passwords dont match", async () => {
@@ -64,9 +75,7 @@ describe("POST /sign-up", () => {
   it("should not store the password", async () => {
     const user = await createUser({});
     await agent.post("/sign-up").send(user.reqData);
-    const dbUser = await user.ormRepository.findOne({
-      where: { email: user.reqData.email },
-    });
+    const dbUser = await findUserWithEmail(user.reqData.email);
     expect(dbUser.password).not.toBe(user.reqData.password);
   });
 });
