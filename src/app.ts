@@ -6,10 +6,10 @@ import "reflect-metadata";
 
 import connectDatabase from "./database";
 
-import myPokemonsRouter from "./routers.ts/myPokemonsRouter";
-import pokemonsRouter from "./routers.ts/pokemonsRouter";
-import signinRouter from "./routers.ts/signinRouter";
-import signupRouter from "./routers.ts/signupRouter";
+import myPokemonsRouter from "./routers/myPokemonsRouter";
+import pokemonsRouter from "./routers/pokemonsRouter";
+import signinRouter from "./routers/signinRouter";
+import signupRouter from "./routers/signupRouter";
 import auth from "./chokepoints/auth";
 import err from "./chokepoints/err";
 import { loadEmails } from "./services/userService";
