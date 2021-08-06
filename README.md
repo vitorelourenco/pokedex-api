@@ -1,9 +1,9 @@
 # Sing Me A Song API
 
-Pokedex is a web api built to serve the website listed in the live demo. It's job is to authenticate users and deliver information on pokemons and how these pokemons relate to the current user. The front end side of this application can be found here [link](https://github.com/vitorelourenco/pokedex-react)
+Pokedex is a web api built to serve the website listed in the live demo. It's job is to authenticate users and deliver information on pokemons and how these pokemons relate to the current user. The front end side of this application can be found here [front end repo](https://github.com/vitorelourenco/pokedex-react)
 
 ## Live Demo
-[link](https://pokedex-rose-six.vercel.app/)
+[live demo](https://pokedex-rose-six.vercel.app/)
 Heroku will put the node server to sleep after a while so you'll have to wait a bit to get a response for your first request.
 
 ## Routes 
@@ -18,7 +18,7 @@ Heroku will put the node server to sleep after a while so you'll have to wait a 
 
 
 ## Visual Database Structure
-[link](https://imgur.com/a/goSDjLP)
+[database image](https://imgur.com/a/goSDjLP)
 
 ## Built With
 
