@@ -9,37 +9,42 @@ export default async function auth(
   res: Response,
   next: NextFunction
 ) {
-  const authorization = req.headers["authorization"];
-  const token = authorization.split("Bearer ")[1];
-
-  const key = process.env.JWT_SECRET;
-  let sessionId;
   try {
-    const data = jwt.verify(token, key) as { sessionId: number };
-    sessionId = data.sessionId;
+    const authorization = req.headers["authorization"];
+    const token = authorization.split("Bearer ")[1];
+
+    const key = process.env.JWT_SECRET;
+    let sessionId;
+    try {
+      const data = jwt.verify(token, key) as { sessionId: number };
+      sessionId = data.sessionId;
+    } catch (err) {
+      return res.status(401).send("invalid token");
+    }
+
+    const sessionRepository = getRepository(Session);
+    const session = await sessionRepository.findOne({ id:sessionId });
+
+    if (!session) {
+      return res.sendStatus(401);
+    }
+
+    const userRepository = getRepository(User);
+    const user = await userRepository
+      .createQueryBuilder("user")
+      .leftJoin("user.sessions", "session")
+      .where("session.id = :sessionId",{sessionId:sessionId})
+      .getOne();
+
+    if(!user){
+      return res.sendStatus(500);
+    }
+
+    res.locals.user = user;
+
+    next();
+    
   } catch (err) {
-    return res.status(401).send("invalid token");
+    next(err);
   }
-
-  const sessionRepository = getRepository(Session);
-  const session = await sessionRepository.findOne({ id:sessionId });
-
-  if (!session) {
-    return res.sendStatus(401);
-  }
-
-  const userRepository = getRepository(User);
-  const user = await userRepository
-    .createQueryBuilder("user")
-    .leftJoin("user.sessions", "session")
-    .where("session.id = :sessionId",{sessionId:sessionId})
-    .getOne();
-
-  if(!user){
-    return res.sendStatus(500);
-  }
-
-  res.locals.user = user;
-
-  next();
 }
