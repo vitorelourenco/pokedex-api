@@ -5,6 +5,7 @@ import { createUser } from "../factories/userFactory";
 import User from "../../src/entities/User";
 import Session from "../../src/entities/Session";
 import jwt from "jsonwebtoken";
+import Pokemon from "../../src/entities/Pokemon";
 
 export async function reset() {
   const connection = getConnection();
@@ -16,32 +17,46 @@ export async function reset() {
   await connection.query(`ALTER SEQUENCE "sessions_id_seq" RESTART WITH 1`);
   await connection.query(`ALTER SEQUENCE "users_id_seq" RESTART WITH 1`);
 
-  for(let i=0; i<5; i++){
+  for (let i = 0; i < 5; i++) {
     const user = await createUser({});
     await user.saveToDatabase();
   }
 }
 
-export async function createAndSignIn(){
+export async function createAndSignIn() {
   const user = await createUser({});
   await user.saveToDatabase();
-  const {email, password} = user.reqData;
-  const response = await supertest(app).post("/sign-in").send({email,password});
-  return {user, response, email, password}
+  const { email, password } = user.reqData;
+  const response = await supertest(app)
+    .post("/sign-in")
+    .send({ email, password });
+  return { user, response, email, password };
 }
 
-export async function createUserAndSession(){
+export async function createUserAndSession() {
   const user = await createUser({});
   await user.saveToDatabase();
-  const {email,password} = user.reqData;
+  const { email, password } = user.reqData;
   const userRepository = getRepository(User);
-  const dbUser = await userRepository.findOne({email});
+  const dbUser = await userRepository.findOne({ email });
   const sessionRepository = getRepository(Session);
-  const newSession = sessionRepository.create({user:dbUser});
+  const newSession = sessionRepository.create({ user: dbUser });
   await sessionRepository.save(newSession);
   const sessionId = newSession.id;
   const key = process.env.JWT_SECRET;
-  const token = jwt.sign({sessionId}, key);
-  const header = {Authorization:`Bearer ${token}`}
-  return {user, token, email, password, header}
+  const token = jwt.sign({ sessionId }, key);
+  const header = { Authorization: `Bearer ${token}` };
+  return { user, token, email, password, header, dbUser };
+}
+
+export async function createUserWithPokemonAndSession(pokemonId?: number) {
+  const { user, token, email, password, header } = await createUserAndSession();
+  const dbUser = await getRepository(User).findOne({
+    where: { email: user.reqData.email },
+    relations: ["pokemons"],
+  });
+  const pokemon = await getRepository(Pokemon).findOne({ id: pokemonId || 1 });
+  dbUser.pokemons.push(pokemon);
+  await getRepository(User).save(dbUser);
+  return { user, token, email, password, header, dbUser };
 }
