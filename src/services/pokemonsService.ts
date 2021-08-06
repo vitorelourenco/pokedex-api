@@ -14,6 +14,7 @@ export async function loadPokemons() {
       pokemonTable.push(pokemonRow);
     }
   );
+  Object.freeze(pokemonTable);
 }
 
 export async function getAll(userId: number) {
