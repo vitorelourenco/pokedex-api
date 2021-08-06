@@ -3,13 +3,6 @@ import Pokemon from "../entities/Pokemon";
 import ResPokemon from "../protocols/ResPokemon";
 import User from "../entities/User";
 
-const emails: { [key: string]: boolean } = {};
-
-export async function loadEmails() {
-  const userList = await getRepository(User).find({ select: ["email"] });
-  userList.forEach((user) => (emails[user.email] = true));
-}
-
 export async function getAll(userId: number) {
   const pokemonsRepository = getRepository(Pokemon);
   const pokemons = await pokemonsRepository.find();
