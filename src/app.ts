@@ -14,6 +14,7 @@ import auth from "./chokepoints/auth";
 import err from "./chokepoints/err";
 import { loadEmails } from "./services/userService";
 import {Request, Response} from 'express';
+import { loadPokemons } from "./services/pokemonsService";
 
 const app = express();
 app.use(cors());
@@ -34,6 +35,7 @@ app.use(err);
 export async function init () {
   await connectDatabase();
   await loadEmails();
+  await loadPokemons();
 }
 
 export default app;

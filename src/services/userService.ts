@@ -8,19 +8,19 @@ import ReqAuthenticate from "../protocols/ReqAuthenticate";
 import Session from "../entities/Session";
 import jwt from "jsonwebtoken";
 
-const emails: { [key: string]: boolean } = {};
+const emailsTable: { [key: string]: boolean } = {};
 
 export async function loadEmails() {
   const userList = await getRepository(User).find({ select: ["email"] });
-  userList.forEach((user) => (emails[user.email] = true));
+  userList.forEach((user) => (emailsTable[user.email] = true));
 }
 
 export async function create(user: UserCreate) {
-  if (emails[user.email])
+  if (emailsTable[user.email])
     throw new DeepValidationError(409, "email is already in use");
 
   try {
-    emails[user.email] = true;
+    emailsTable[user.email] = true;
     const hashedPassword = bcrypt.hashSync(user.password, 10);
     const safeUser = getRepository(User).create({
       email: user.email,
@@ -28,7 +28,7 @@ export async function create(user: UserCreate) {
     });
     await getRepository(User).save(safeUser);
   } catch (err) {
-    delete emails[user.email];
+    delete emailsTable[user.email];
     throw err;
   }
 }

@@ -3,35 +3,33 @@ import Pokemon from "../entities/Pokemon";
 import ResPokemon from "../protocols/ResPokemon";
 import User from "../entities/User";
 
-export async function getAll(userId: number) {
-  const pokemonsRepository = getRepository(Pokemon);
-  const pokemons = await pokemonsRepository.find();
+const pokemonTable: ResPokemon[] = [];
 
+export async function loadPokemons() {
+  const pokemonsList = await getRepository(Pokemon).find();
+  pokemonsList.forEach(
+    (pokemon) =>{
+      const pokemonRow = { ...pokemon, inMyPokemons: false };
+      Object.freeze(pokemonRow);
+      pokemonTable.push(pokemonRow);
+    }
+  );
+}
+
+export async function getAll(userId: number) {
   const userRepository = getRepository(User);
   const userWithPokemons = await userRepository.findOne({
     relations: ["pokemons"],
     where: { id: userId },
   });
 
-  const pokemonsWithUserStatus = pokemons.map((pokemon) => {
-    const { id, name, number, image, weight, height, baseExp, description } =
-      pokemon;
-    const inMyPokemons = !!userWithPokemons.pokemons.find(
-      (pokemon: Pokemon) => pokemon.id === id
-    );
-    const out: ResPokemon = {
-      id,
-      name,
-      number,
-      image,
-      weight,
-      height,
-      baseExp,
-      description,
-      inMyPokemons,
-    };
-    return out;
-  });
+  const pokemons = [...pokemonTable];
+  userWithPokemons.pokemons.forEach(
+    (pokemon) => {
+      pokemons[pokemon.id-1] = {...pokemons[pokemon.id-1]};
+      pokemons[pokemon.id-1].inMyPokemons = true;
+    }
+  );
 
-  return pokemonsWithUserStatus;
+  return pokemons;
 }
