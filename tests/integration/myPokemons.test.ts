@@ -43,10 +43,10 @@ describe("POST /my-pokemons/:id/add", () => {
 
   it("should add pokemon id 1 to users pokemons", async () => {
     const { header, user } = await createUserAndSession();
-    await agent.post("/my-pokemons/1/add").set(header);
+    const response = await agent.post("/my-pokemons/1/add").set(header);
     const dbUser = await getRepository(User).findOne({
       relations: ["pokemons"],
-      where: { id: user.reqData.id },
+      where: { email: user.reqData.email },
     });
     const contains = !!dbUser?.pokemons?.find((pokemon)=>pokemon.id === 1)
     expect(contains).toBe(true);
